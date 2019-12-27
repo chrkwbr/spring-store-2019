@@ -1,12 +1,11 @@
 package ninja.cero.store;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.annotation.SessionScope;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@SessionScope
 public class UserContext {
-	public String cartId;
+
+    public String cartId;
 }
