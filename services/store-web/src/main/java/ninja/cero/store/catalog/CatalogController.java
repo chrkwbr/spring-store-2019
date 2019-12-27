@@ -4,7 +4,6 @@ import ninja.cero.store.item.client.ItemClient;
 import ninja.cero.store.item.domain.Item;
 import ninja.cero.store.stock.client.StockClient;
 import ninja.cero.store.stock.domain.Stock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,22 +17,26 @@ import java.util.stream.Collectors;
 @RequestMapping("/catalog")
 @CrossOrigin
 public class CatalogController {
-    @Autowired
-    ItemClient itemClient;
 
-    @Autowired
-    StockClient stockClient;
+    private final ItemClient itemClient;
+
+    private final StockClient stockClient;
+
+    public CatalogController(ItemClient itemClient, StockClient stockClient) {
+        this.itemClient = itemClient;
+        this.stockClient = stockClient;
+    }
 
     @GetMapping
     public List<CatalogItem> findCatalog() {
         List<Item> items = itemClient.findAll();
         List<Long> ids = items.stream()
-                .map(i -> i.id)
-                .collect(Collectors.toList());
+            .map(i -> i.id)
+            .collect(Collectors.toList());
 
         List<Stock> stocks = stockClient.findByIds(ids);
         Map<Long, Integer> stockMap = stocks.stream()
-                .collect(Collectors.toMap(s -> s.itemId, s -> s.quantity));
+            .collect(Collectors.toMap(s -> s.itemId, s -> s.quantity));
 
         // Filter items by stock
         return items.stream().map(item -> {

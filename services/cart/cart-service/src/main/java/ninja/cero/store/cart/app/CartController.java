@@ -8,8 +8,12 @@ import ninja.cero.store.cart.domain.CartEvent;
 import ninja.cero.store.cart.domain.CartItem;
 import ninja.cero.store.item.client.ItemClient;
 import ninja.cero.store.item.domain.Item;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -21,24 +25,29 @@ import java.util.stream.StreamSupport;
 
 @RestController
 public class CartController {
-    @Autowired
-    CartRepository cartRepository;
 
-    @Autowired
-    ItemClient itemClient;
+    private final CartRepository cartRepository;
 
-    ObjectMapper mapper = new ObjectMapper();
+    private final ItemClient itemClient;
+
+    private final ObjectMapper mapper;
+
+    public CartController(CartRepository cartRepository, ItemClient itemClient, ObjectMapper mapper) {
+        this.cartRepository = cartRepository;
+        this.itemClient = itemClient;
+        this.mapper = mapper;
+    }
 
     @GetMapping
     public List<Cart> findAll() {
         return StreamSupport.stream(cartRepository.findAll().spliterator(), false).map(this::toCart)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     @GetMapping("/{cartId}")
     public Optional<Cart> findCartById(@PathVariable Long cartId) {
         return cartRepository.findById(cartId)
-                .map(this::toCart);
+            .map(this::toCart);
     }
 
     @GetMapping("/{cartId}/detail")
@@ -55,7 +64,7 @@ public class CartController {
         cartDetail.cartId = entity.id;
 
         Map<Long, Item> itemMap = items.stream()
-                .collect(Collectors.toMap(i -> i.id, i -> i));
+            .collect(Collectors.toMap(i -> i.id, i -> i));
 
         // Resolve cart items
         cartDetail.items = cart.items.entrySet().stream().map(i -> {
@@ -76,9 +85,9 @@ public class CartController {
         }).collect(Collectors.toList());
 
         cartDetail.total = cartDetail.items.stream()
-                .map(i -> i.unitPrice.multiply(new BigDecimal(i.quantity)))
-                .reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
+            .map(i -> i.unitPrice.multiply(new BigDecimal(i.quantity)))
+            .reduce(BigDecimal::add)
+            .orElse(BigDecimal.ZERO);
         return cartDetail;
     }
 
@@ -88,7 +97,7 @@ public class CartController {
         try {
             Map<?, ?> map = mapper.readValue(entity.items, Map.class);
             cart.items = map.entrySet().stream().collect(Collectors.toMap(e -> Long.valueOf(e.getKey().toString()),
-                    e -> Integer.valueOf(e.getValue().toString())));
+                e -> Integer.valueOf(e.getValue().toString())));
         } catch (IOException ex) {
             throw new RuntimeException("Json deserialzie error", ex);
         }
@@ -117,7 +126,7 @@ public class CartController {
     @PostMapping("/{cartId}")
     public Cart addItem(@PathVariable Long cartId, @RequestBody CartEvent cartEvent) {
         Cart cart = cartRepository.findById(cartId).map(this::toCart)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         cart.items.compute(cartEvent.itemId, (key, old) -> old == null ? cartEvent.quantity : old + cartEvent.quantity);
         cartRepository.save(toEntity(cart));
@@ -128,7 +137,7 @@ public class CartController {
     @DeleteMapping("/{cartId}/items/{itemId}")
     public Cart removeItem(@PathVariable Long cartId, @PathVariable Long itemId) {
         Cart cart = cartRepository.findById(cartId).map(this::toCart)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+            .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         cart.items.remove(itemId);
         cartRepository.save(toEntity(cart));

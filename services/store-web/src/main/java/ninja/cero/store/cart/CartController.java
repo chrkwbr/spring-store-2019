@@ -6,8 +6,14 @@ import ninja.cero.store.cart.domain.CartDetail;
 import ninja.cero.store.cart.domain.CartEvent;
 import ninja.cero.store.stock.client.StockClient;
 import ninja.cero.store.stock.domain.Stock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,11 +22,15 @@ import java.util.List;
 @RequestMapping("/cart")
 @CrossOrigin
 public class CartController {
-    @Autowired
-    CartClient cartClient;
 
-    @Autowired
-    StockClient stockClient;
+    private final CartClient cartClient;
+
+    private final StockClient stockClient;
+
+    public CartController(CartClient cartClient, StockClient stockClient) {
+        this.cartClient = cartClient;
+        this.stockClient = stockClient;
+    }
 
     @PostMapping
     public Cart createCart() {

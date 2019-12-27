@@ -9,7 +9,6 @@ import ninja.cero.store.payment.client.PaymentClient;
 import ninja.cero.store.payment.domain.Payment;
 import ninja.cero.store.stock.client.StockClient;
 import ninja.cero.store.stock.domain.Stock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,33 +18,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 @RestController
 @EnableBinding(OrderSource.class)
 public class OrderController {
-    @Autowired
-    OrderRepository orderRepository;
 
-    @Autowired
-    OrderEventRepository orderEventRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    OrderSource orderSource;
+    private final OrderEventRepository orderEventRepository;
 
-    @Autowired
-    CartClient cartClient;
+    private final OrderSource orderSource;
 
-    @Autowired
-    StockClient stockClient;
+    private final CartClient cartClient;
 
-    @Autowired
-    PaymentClient paymentClient;
+    private final StockClient stockClient;
 
-    @Autowired
-    public OrderController(OrderSource orderSource) {
-        System.out.println(orderSource);
+    private final PaymentClient paymentClient;
+
+    public OrderController(OrderRepository orderRepository, OrderEventRepository orderEventRepository, OrderSource orderSource, CartClient cartClient, StockClient stockClient,
+                           PaymentClient paymentClient) {
+        this.orderRepository = orderRepository;
+        this.orderEventRepository = orderEventRepository;
+        this.orderSource = orderSource;
+        this.cartClient = cartClient;
+        this.stockClient = stockClient;
+        this.paymentClient = paymentClient;
     }
 
     @PostMapping
