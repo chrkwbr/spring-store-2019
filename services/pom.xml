@@ -64,12 +64,6 @@
 				<artifactId>logstash-logback-encoder</artifactId>
 				<version>6.1</version>
 			</dependency>
-			<dependency>
-				<groupId>co.elastic.apm</groupId>
-				<artifactId>apm-agent-attach</artifactId>
-				<version>1.9.0</version>
-			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 

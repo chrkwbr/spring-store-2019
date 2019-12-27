@@ -70,15 +70,6 @@ services:
     networks:
       - demo
 
-  elastic-apm:
-    image: docker.elastic.co/apm/apm-server:7.3.2
-    ports:
-      - 8200:8200
-    depends_on:
-      - elasticsearch
-    networks:
-      - demo
-
 networks:
   demo:
     external: true

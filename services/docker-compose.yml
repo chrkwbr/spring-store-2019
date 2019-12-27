@@ -48,7 +48,7 @@ services:
     volumes:
       - ./store-web/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/store-web-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/store-web-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
@@ -63,7 +63,7 @@ services:
     volumes:
       - ./item/item-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/item-service-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/item-service-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
@@ -78,7 +78,7 @@ services:
     volumes:
       - ./stock/stock-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/stock-service-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/stock-service-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
@@ -93,7 +93,7 @@ services:
     volumes:
       - ./cart/cart-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/cart-service-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/cart-service-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
@@ -108,7 +108,7 @@ services:
     volumes:
       - ./order/order-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/order-service-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/order-service-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
@@ -123,7 +123,7 @@ services:
     volumes:
       - ./payment/payment-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -Delastic.apm.server_urls=http://elastic-apm:8200 -jar /app/payment-service-1.0.0.jar
+    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/payment-service-1.0.0.jar
     logging:
       driver: "fluentd"
       options:
