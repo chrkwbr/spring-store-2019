@@ -10,6 +10,19 @@ services:
     networks:
     - demo
 
+  mysql:
+    image: mysql:8
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    - ./mysql:/docker-entrypoint-initdb.d
+    environment:
+    - MYSQL_USER=root
+    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    ports:
+    - 3306:3306
+    networks:
+    - demo
+
   # Monitoring
   zipkin-server:
     image: openzipkin/zipkin-slim

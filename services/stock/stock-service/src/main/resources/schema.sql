@@ -1,5 +1,5 @@
-CREATE TABLE stock
+CREATE TABLE IF NOT EXISTS stock
 (
-  item_id BIGINT NOT NULL PRIMARY KEY,
-  quantity INTEGER
+    item_id  BIGINT NOT NULL PRIMARY KEY,
+    quantity INTEGER
 );
