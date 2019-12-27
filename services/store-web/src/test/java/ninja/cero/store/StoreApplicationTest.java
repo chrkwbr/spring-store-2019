@@ -31,6 +31,7 @@ public class StoreApplicationTest {
 
         System.out.println("checkout");
         Map<String, Object> map = new HashMap<>();
+        map.put("cartId", cart.cartId);
         map.put("name", "Shin Tanimoto");
         map.put("address", "Yokohama Japan");
         map.put("telephone", "+81 123 456 7890");
@@ -64,7 +65,7 @@ public class StoreApplicationTest {
 
         System.out.println("add cart");
         Map<String, Object> cartItem = new HashMap<>();
-        cartItem.put("itemId", 2);
+        cartItem.put("itemId", 1);
         cartItem.put("quantity", 1);
         System.out.println(restTemplate.postForObject("http://localhost:9000/cart/" + cart.cartId, cartItem, Object.class));
     }
