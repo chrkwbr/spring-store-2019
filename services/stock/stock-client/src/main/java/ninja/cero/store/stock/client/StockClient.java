@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StockClient {
+
     private static final String STOCK_URL = "http://stock-service";
 
     RestTemplate restTemplate;
 
     ParameterizedTypeReference<List<Stock>> type = new ParameterizedTypeReference<>() {
+
     };
 
     public StockClient(RestTemplate restTemplate) {
@@ -27,7 +29,7 @@ public class StockClient {
 
     public List<Stock> findByIds(Collection<Long> ids) {
         String idString = ids.stream().map(Object::toString).collect(Collectors.joining(","));
-        return restTemplate.exchange(STOCK_URL + "/" + idString, HttpMethod.GET, null, type).getBody();
+        return restTemplate.exchange(STOCK_URL + "/{ids}", HttpMethod.GET, null, type, idString).getBody();
     }
 
     public void keepStock(List<Stock> keeps) {

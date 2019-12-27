@@ -10,11 +10,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 public class CartClient {
+
     private static final String CART_URL = "http://cart-service";
 
     RestTemplate restTemplate;
 
     ParameterizedTypeReference<List<Cart>> type = new ParameterizedTypeReference<>() {
+
     };
 
     public CartClient(RestTemplate restTemplate) {
@@ -26,11 +28,11 @@ public class CartClient {
     }
 
     public Cart findCartById(String cartId) {
-        return restTemplate.getForObject(CART_URL + "/" + cartId, Cart.class);
+        return restTemplate.getForObject(CART_URL + "/{cartId}", Cart.class, cartId);
     }
 
     public CartDetail findCartDetailById(String cartId) {
-        return restTemplate.getForObject(CART_URL + "/" + cartId + "/detail", CartDetail.class);
+        return restTemplate.getForObject(CART_URL + "/{cartId}/detail", CartDetail.class, cartId);
     }
 
     public Cart createCart() {
@@ -38,10 +40,10 @@ public class CartClient {
     }
 
     public Cart addItem(String cartId, CartEvent cartEvent) {
-        return restTemplate.postForObject(CART_URL + "/" + cartId, cartEvent, Cart.class);
+        return restTemplate.postForObject(CART_URL + "/{cartId}", cartEvent, Cart.class, cartId);
     }
 
     public void removeItem(String cartId, Long itemId) {
-        restTemplate.delete(CART_URL + "/" + cartId + "/" + "items" + "/" + itemId);
+        restTemplate.delete(CART_URL + "/{cartId}/items/{itemId}", cartId, itemId);
     }
 }
