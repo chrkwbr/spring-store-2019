@@ -59,17 +59,6 @@ services:
     networks:
       - demo
 
-  fluentd:
-    build: ./fluentd
-    volumes:
-      - ./fluentd/config:/fluentd/etc
-    ports:
-      - "24224:24224"
-    depends_on:
-      - elasticsearch
-    networks:
-      - demo
-
 networks:
   demo:
     external: true
