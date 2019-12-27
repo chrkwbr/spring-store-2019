@@ -21,6 +21,11 @@
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+		<cart.version>1.0.0</cart.version>
+		<item.version>1.0.0</item.version>
+		<stock.version>1.0.0</stock.version>
+		<order.version>1.0.0</order.version>
+		<payment.version>1.0.0</payment.version>
 	</properties>
 
 	<modules>
@@ -52,6 +57,86 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>cart-domain</artifactId>
+				<version>${cart.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>cart-client</artifactId>
+				<version>${cart.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>cart-service</artifactId>
+				<version>${cart.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>item-domain</artifactId>
+				<version>${item.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>item-client</artifactId>
+				<version>${item.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>item-service</artifactId>
+				<version>${item.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>stock-domain</artifactId>
+				<version>${stock.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>stock-client</artifactId>
+				<version>${stock.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>stock-service</artifactId>
+				<version>${stock.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>order-domain</artifactId>
+				<version>${order.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>order-client</artifactId>
+				<version>${order.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>order-service</artifactId>
+				<version>${order.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>payment-domain</artifactId>
+				<version>${payment.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>payment-client</artifactId>
+				<version>${payment.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ninja.cero.store</groupId>
+				<artifactId>payment-service</artifactId>
+				<version>${payment.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
