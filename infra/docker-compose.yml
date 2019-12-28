@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   # Infrastructure
@@ -24,6 +24,43 @@ services:
     - demo
 
   # Monitoring
+  prometheus:
+    image: prom/prometheus:v2.15.1
+    volumes:
+    - ./prometheus/:/etc/prometheus/
+    command: --config.file=/etc/prometheus/prometheus.yml
+    ports:
+    - 9090:9090
+    networks:
+    - demo
+
+  prometheus-proxy:
+    image: micrometermetrics/prometheus-rsocket-proxy:0.9.0
+    ports:
+    - 18080:8080
+    - 8081:8081
+    - 7001:7001
+    mem_limit: 256m
+    environment:
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - MANAGEMENT_METRICS_TAGS_APPLICATION=prometheus-proxy
+    - MANAGEMENT_METRICS_TAGS_ORGANIZATION=system
+    - MANAGEMENT_METRICS_TAGS_SPACE=monitoring-tools
+    - MANAGEMENT_METRICS_TAGS_INSTANCE_ID=prometheus-proxy:0
+    networks:
+    - demo
+
+  grafana:
+    image: grafana/grafana:6.5.2
+    volumes:
+    - ./grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+    - 3000:3000
+    environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+    - demo
+
   zipkin-server:
     image: openzipkin/zipkin-slim
     ports:
