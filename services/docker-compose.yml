@@ -3,101 +3,140 @@ version: '2'
 services:
   # Infra
   discovery-server:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 8761:8761
+    - 8761:8761
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./discovery-server/target:/app
+    - ./discovery-server/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/discovery-server-1.0.0.jar
+    command: java -jar /app/discovery-server-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   gateway-server:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 8080:8080
+    - 8080:8080
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./gateway-server/target:/app
+    - ./gateway-server/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/gateway-server-1.0.0.jar
+    command: java -jar /app/gateway-server-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   # UI
   ui:
     build: ./ui/
     ports:
-      - "8000:80"
+    - "8000:80"
     networks:
-      - demo
+    - demo
 
   # Services
   store-web:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9000:9000
+    - 9000:9000
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./store-web/target:/app
+    - ./store-web/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/store-web-1.0.0.jar
+    command: java -jar /app/store-web-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   item-service:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9001:9001
+    - 9001:9001
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./item/item-service/target:/app
+    - ./item/item-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/item-service-1.0.0.jar
+    command: java -jar /app/item-service-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   stock-service:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9002:9002
+    - 9002:9002
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./stock/stock-service/target:/app
+    - ./stock/stock-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/stock-service-1.0.0.jar
+    command: java -jar /app/stock-service-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   cart-service:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9003:9003
+    - 9003:9003
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./cart/cart-service/target:/app
+    - ./cart/cart-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/cart-service-1.0.0.jar
+    command: java -jar /app/cart-service-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   order-service:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9004:9004
+    - 9004:9004
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./order/order-service/target:/app
+    - ./order/order-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/order-service-1.0.0.jar
+    command: java -jar /app/order-service-1.0.0.jar
     networks:
-      - demo
+    - demo
 
   payment-service:
-    image: openjdk:11-jdk
+    image: adoptopenjdk/openjdk11:alpine-slim
     ports:
-      - 9005:9005
+    - 9005:9005
+    mem_limit: 256m
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    - SERVER_TOMCAT_MAX_THREADS=4
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     volumes:
-      - ./payment/payment-service/target:/app
+    - ./payment/payment-service/target:/app
     working_dir: /app
-    command: java -Xmx1g -Dspring.profiles.active=docker -jar /app/payment-service-1.0.0.jar
+    command: java -jar /app/payment-service-1.0.0.jar
     networks:
-      - demo
+    - demo
 
 networks:
   demo:
