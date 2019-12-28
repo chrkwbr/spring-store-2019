@@ -59,6 +59,17 @@ services:
     networks:
     - demo
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.5.1
+    volumes:
+    - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+    - 4560:4560
+    depends_on:
+    - elasticsearch
+    networks:
+    - demo
+
 networks:
   demo:
     external: true

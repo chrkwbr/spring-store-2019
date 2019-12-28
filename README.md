@@ -21,10 +21,9 @@ curl localhost:9200
 curl localhost:5601 -i
 ```
 
-5. Create Kibana dashboard (only for initialization)
+5. Configure Kibana (only for initialization)
 ```
-cd infra/metricbeat_dashboard
-./create_dashboard.sh
+./infra/kibana/setup.sh
 ```
 
 6. Build and run services
