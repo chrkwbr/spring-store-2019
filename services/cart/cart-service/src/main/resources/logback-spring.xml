@@ -1,78 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <springProperty scope="context" name="spring.application.name" source="spring.application.name"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-/tmp}}/${spring.application.name}.log}"/>
+
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>​
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
 
-    <springProperty scope="context" name="spring.application.name" source="spring.application.name"/>
-    <springProperty scope="context" name="logstash.destination" source="logstash.destination"/>
-
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${logstash.destination}</destination>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>UTC</timeZone>
-                </timestamp>
-                <pattern>
-                    <omitEmptyFields>true</omitEmptyFields>
-                    <pattern>
-                        {
-                        "level": "%level",
-                        "application": "${spring.application.name:-}",
-                        "trace_id": "%X{X-B3-TraceId:-}",
-                        "span_id": "%X{X-B3-SpanId:-}",
-                        "parent_span_id": "%X{X-B3-ParentSpanId:-}",
-                        "exported": "%X{X-Span-Export:-}",
-                        "pid": "${PID:-}",
-                        "thread": "%thread",
-                        "logger": "%logger{40}",
-                        "message": "%message",
-                        "exception": "%exception"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
-
-    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>UTC</timeZone>
-                </timestamp>
-                <pattern>
-                    <omitEmptyFields>true</omitEmptyFields>
-                    <pattern>
-                        {
-                        "level": "%level",
-                        "application": "${spring.application.name:-}",
-                        "trace_id": "%X{X-B3-TraceId:-}",
-                        "span_id": "%X{X-B3-SpanId:-}",
-                        "parent_span_id": "%X{X-B3-ParentSpanId:-}",
-                        "exported": "%X{X-Span-Export:-}",
-                        "pid": "${PID:-}",
-                        "thread": "%thread",
-                        "logger": "%logger{40}",
-                        "message": "%message",
-                        "exception": "%exception"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
-
-    <springProfile name="default,docker">
+    <springProfile name="default">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOGSTASH"/>
+            <appender-ref ref="FILE"/>
         </root>
     </springProfile>
-
-    <springProfile name="cloud">
+    <springProfile name="!default">
         <root level="info">
-            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
 </configuration>

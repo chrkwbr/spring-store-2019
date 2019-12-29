@@ -1,7 +1,6 @@
 version: '2'
 
 services:
-  # Infrastructure
   rabbit-mq:
     image: rabbitmq:3-management
     ports:
@@ -23,7 +22,6 @@ services:
     networks:
     - demo
 
-  # Monitoring
   prometheus:
     image: prom/prometheus:v2.15.1
     volumes:
@@ -100,8 +98,12 @@ services:
     image: docker.elastic.co/logstash/logstash:7.5.1
     volumes:
     - ./logstash/pipeline:/usr/share/logstash/pipeline
+    - /tmp:/tmp/logs
+    environment:
+    - "LS_JAVA_OPTS=-Xms768m -Xmx768m"
+    mem_limit: 1G
     ports:
-    - 4560:4560
+    - 5514:5514
     depends_on:
     - elasticsearch
     networks:

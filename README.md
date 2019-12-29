@@ -23,7 +23,7 @@ curl localhost:5601 -i
 
 5. Configure Kibana (only for initialization)
 ```
-./infra/kibana/setup.sh
+bash ./infra/kibana/setup.sh
 ```
 
 6. Build and run services

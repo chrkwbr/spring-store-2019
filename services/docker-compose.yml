@@ -10,13 +10,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./discovery-server/target:/app
     working_dir: /app
     command: java -jar /app/discovery-server-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   gateway-server:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -25,13 +30,18 @@ services:
     mem_limit: 256m
     environment:
     - SPRING_PROFILES_ACTIVE=docker
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./gateway-server/target:/app
     working_dir: /app
     command: java -jar /app/gateway-server-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   # UI
   ui:
@@ -40,6 +50,11 @@ services:
     - "8000:80"
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   # Services
   store-web:
@@ -50,13 +65,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./store-web/target:/app
     working_dir: /app
     command: java -jar /app/store-web-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   item-service:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -66,13 +86,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./item/item-service/target:/app
     working_dir: /app
     command: java -jar /app/item-service-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   stock-service:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -82,13 +107,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./stock/stock-service/target:/app
     working_dir: /app
     command: java -jar /app/stock-service-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   cart-service:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -98,13 +128,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./cart/cart-service/target:/app
     working_dir: /app
     command: java -jar /app/cart-service-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   order-service:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -114,13 +149,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./order/order-service/target:/app
     working_dir: /app
     command: java -jar /app/order-service-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
   payment-service:
     image: adoptopenjdk/openjdk11:alpine-slim
@@ -130,13 +170,18 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./payment/payment-service/target:/app
     working_dir: /app
     command: java -jar /app/payment-service-1.0.0.jar
     networks:
     - demo
+    logging:
+      driver: syslog
+      options:
+        syslog-address: tcp://localhost:5514
+        syslog-format: rfc5424
 
 networks:
   demo:
