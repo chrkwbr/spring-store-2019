@@ -13,3 +13,13 @@ scrape_configs:
   static_configs:
   - targets:
     - prometheus-proxy:8080
+- job_name: "zipkin"
+  metrics_path: /actuator/prometheus
+  static_configs:
+  - targets:
+    - zipkin-server:9411
+    labels:
+      application: zipkin
+      organization: system
+      space: monitoring-tools
+      instance_id: zipkin:0

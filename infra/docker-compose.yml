@@ -63,6 +63,9 @@ services:
     image: openzipkin/zipkin-slim
     ports:
     - 9411:9411
+    mem_limit: 256m
+    environment:
+    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k"
     networks:
     - demo
 

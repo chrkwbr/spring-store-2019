@@ -9,3 +9,12 @@ providers:
   allowUiUpdates: true
   options:
     path: /etc/grafana/provisioning/dashboards/micrometer
+- name: zipkin
+  orgId: 1
+  folder: Zipkin
+  type: file
+  disableDeletion: false
+  editable: true
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboards/zipkin
