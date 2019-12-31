@@ -1,0 +1,9 @@
+applications:
+- name: eureka
+  memory: 256m
+  path: target/discovery-server-1.0.0.jar
+  random-route: true
+  env:
+    SERVER_TOMCAT_MAX_THREADS: 4
+    JAVA_OPTS: -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo
+    JBP_CONFIG_OPEN_JDK_JRE: '{memory_calculator: {stack_threads: 20}, jre: {version: 11.+}}'

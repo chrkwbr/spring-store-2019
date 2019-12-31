@@ -1,0 +1,7 @@
+applications:
+- name: store-ui
+  memory: 32m
+  path: dist
+  random-route: true
+  buildpacks:
+  - staticfile_buildpack
