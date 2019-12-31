@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "cart.url",
+      "type": "java.lang.String",
+      "description": "URL of Cart service.",
+      "defaultValue": "http://localhost:9003"
+    }
+  ]
+}

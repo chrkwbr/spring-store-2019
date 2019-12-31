@@ -29,7 +29,6 @@
 	</properties>
 
 	<modules>
-		<module>discovery-server</module>
 		<module>gateway-server</module>
 
 		<module>cart/cart-client</module>

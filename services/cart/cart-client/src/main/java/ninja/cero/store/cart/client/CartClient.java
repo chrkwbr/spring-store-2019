@@ -11,39 +11,40 @@ import java.util.List;
 
 public class CartClient {
 
-    private static final String CART_URL = "http://cart-service";
+    private final RestTemplate restTemplate;
 
-    RestTemplate restTemplate;
+    private final String cartUrl;
 
     ParameterizedTypeReference<List<Cart>> type = new ParameterizedTypeReference<>() {
 
     };
 
-    public CartClient(RestTemplate restTemplate) {
+    public CartClient(RestTemplate restTemplate, String cartUrl) {
         this.restTemplate = restTemplate;
+        this.cartUrl = cartUrl;
     }
 
     public List<Cart> findAll() {
-        return restTemplate.exchange(CART_URL, HttpMethod.GET, null, type).getBody();
+        return restTemplate.exchange(this.cartUrl, HttpMethod.GET, null, type).getBody();
     }
 
     public Cart findCartById(String cartId) {
-        return restTemplate.getForObject(CART_URL + "/{cartId}", Cart.class, cartId);
+        return restTemplate.getForObject(this.cartUrl + "/{cartId}", Cart.class, cartId);
     }
 
     public CartDetail findCartDetailById(String cartId) {
-        return restTemplate.getForObject(CART_URL + "/{cartId}/detail", CartDetail.class, cartId);
+        return restTemplate.getForObject(this.cartUrl + "/{cartId}/detail", CartDetail.class, cartId);
     }
 
     public Cart createCart() {
-        return restTemplate.postForObject(CART_URL, null, Cart.class);
+        return restTemplate.postForObject(this.cartUrl, null, Cart.class);
     }
 
     public Cart addItem(String cartId, CartEvent cartEvent) {
-        return restTemplate.postForObject(CART_URL + "/{cartId}", cartEvent, Cart.class, cartId);
+        return restTemplate.postForObject(this.cartUrl + "/{cartId}", cartEvent, Cart.class, cartId);
     }
 
     public void removeItem(String cartId, Long itemId) {
-        restTemplate.delete(CART_URL + "/{cartId}/items/{itemId}", cartId, itemId);
+        restTemplate.delete(this.cartUrl + "/{cartId}/items/{itemId}", cartId, itemId);
     }
 }

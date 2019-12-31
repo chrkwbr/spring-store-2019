@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "stock.url",
+      "type": "java.lang.String",
+      "description": "URL of Stock service.",
+      "defaultValue": "http://localhost:9002"
+    }
+  ]
+}

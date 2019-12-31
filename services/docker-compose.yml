@@ -1,28 +1,6 @@
 version: '2'
 
 services:
-  # Infra
-  discovery-server:
-    image: adoptopenjdk/openjdk11:alpine-slim
-    ports:
-    - 8761:8761
-    mem_limit: 256m
-    environment:
-    - SPRING_PROFILES_ACTIVE=docker
-    - SERVER_TOMCAT_MAX_THREADS=4
-    - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
-    volumes:
-    - ./discovery-server/target:/app
-    working_dir: /app
-    command: java -jar /app/discovery-server-1.0.0.jar
-    networks:
-    - demo
-    logging:
-      driver: syslog
-      options:
-        syslog-address: tcp://localhost:5514
-        syslog-format: rfc5424
-
   gateway-server:
     image: adoptopenjdk/openjdk11:alpine-slim
     ports:

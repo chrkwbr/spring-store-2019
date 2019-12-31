@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "order.url",
+      "type": "java.lang.String",
+      "description": "URL of Order service.",
+      "defaultValue": "http://localhost:9004"
+    }
+  ]
+}

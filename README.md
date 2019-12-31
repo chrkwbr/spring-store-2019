@@ -55,7 +55,6 @@ cf create-service p.mysql db-small order-db
 cf create-service p.mysql db-small payment-db
 cf create-service p.mysql db-small stock-db
 cf create-service p.rabbitmq single-node-3.7 payment-mq
-cf create-user-provided-service metrics-endpoint-actuator-prometheus -l metrics-endpoint:///actuator/prometheus
 ```
 
 or for Pivotal Web Services
@@ -67,7 +66,6 @@ cf create-service cleardb spark order-db
 cf create-service cleardb spark payment-db
 cf create-service cleardb spark stock-db
 cf create-service cloudamqp lemur payment-mq
-cf create-user-provided-service metrics-endpoint-actuator-prometheus -l metrics-endpoint:///actuator/prometheus
 ```
 
 Deploy Zipkin
@@ -89,15 +87,49 @@ cd services
 ./build.sh
 ```
 
-Deploy Eureka first
+For the first time, deploy services int the following order
 
 ```
-cf push -f discovery-server/manifest.yml 
-EUREKA_HOST=$(cf curl /v2/apps/$(cf app eureka --guid)/routes | jq -r '.resources[0].entity.host')
-EUREKA_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app eureka --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service discovery -p "{\"url\":\"https://${EUREKA_HOST}.${EUREKA_DOMAIN}\"}"
+cf push -f item/item-service/manifest.yml 
+ITEM_HOST=$(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.host')
+ITEM_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service item -p "{\"url\":\"https://${ITEM_HOST}.${ITEM_DOMAIN}\"}"
 ```
 
+```
+cf push -f stock/stock-service/manifest.yml 
+STOCK_HOST=$(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.host')
+STOCK_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service stock -p "{\"url\":\"https://${STOCK_HOST}.${STOCK_DOMAIN}\"}"
+```
+
+```
+cf push -f payment/payment-service/manifest.yml 
+PAYMENT_HOST=$(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.host')
+PAYMENT_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service payment -p "{\"url\":\"https://${PAYMENT_HOST}.${PAYMENT_DOMAIN}\"}"
+```
+
+```
+cf push -f cart/cart-service/manifest.yml 
+CART_HOST=$(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.host')
+CART_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service cart -p "{\"url\":\"https://${CART_HOST}.${CART_DOMAIN}\"}"
+```
+
+```
+cf push -f order/order-service/manifest.yml 
+ORDER_HOST=$(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.host')
+ORDER_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service order -p "{\"url\":\"https://${ORDER_HOST}.${ORDER_DOMAIN}\"}"
+```
+
+```
+cf push -f store-web/manifest.yml 
+STORE_WEB_HOST=$(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.host')
+STORE_WEB_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service store-web -p "{\"url\":\"https://${STORE_WEB_HOST}.${STORE_WEB_DOMAIN}\"}"
+```
 
 and deploy UI
 
@@ -106,21 +138,15 @@ cd ui
 npm run build
 
 cf push
-UI_HOST=$(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.host')
-UI_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service store-ui -p "{\"url\":\"https://${UI_HOST}.${UI_DOMAIN}\"}"
+STORE_UI_HOST=$(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.host')
+STORE_UI_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service store-ui -p "{\"url\":\"https://${STORE_UI_HOST}.${STORE_UI_DOMAIN}\"}"
 
 cd ..
 ```
 
-then all services
+Finally deploy the gateway
 
 ```
 cf push -f gateway-server/manifest.yml 
-cf push -f cart/cart-service/manifest.yml
-cf push -f item/item-service/manifest.yml
-cf push -f stock/stock-service/manifest.yml
-cf push -f order/order-service/manifest.yml
-cf push -f payment/payment-service/manifest.yml
-cf push -f store-web/manifest.yml 
 ```

@@ -8,26 +8,29 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 public class PaymentClient {
-    private static final String PAYMENT_URL = "http://payment-service";
 
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    private final String paymentUrl;
 
     ParameterizedTypeReference<List<Payment>> type = new ParameterizedTypeReference<>() {
+
     };
 
-    public PaymentClient(RestTemplate restTemplate) {
+    public PaymentClient(RestTemplate restTemplate, String paymentUrl) {
         this.restTemplate = restTemplate;
+        this.paymentUrl = paymentUrl;
     }
 
     public void check(Payment payment) {
-        restTemplate.postForObject(PAYMENT_URL + "/check", payment, Void.class);
+        restTemplate.postForObject(this.paymentUrl + "/check", payment, Void.class);
     }
 
     public void processPayment(Payment payment) {
-        restTemplate.postForObject(PAYMENT_URL, payment, Void.class);
+        restTemplate.postForObject(this.paymentUrl, payment, Void.class);
     }
 
     public List<Payment> findAll() {
-        return restTemplate.exchange(PAYMENT_URL, HttpMethod.GET, null, type).getBody();
+        return restTemplate.exchange(this.paymentUrl, HttpMethod.GET, null, type).getBody();
     }
 }

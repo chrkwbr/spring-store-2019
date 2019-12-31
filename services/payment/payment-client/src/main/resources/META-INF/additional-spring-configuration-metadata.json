@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "payment.url",
+      "type": "java.lang.String",
+      "description": "URL of Payment service.",
+      "defaultValue": "http://localhost:9005"
+    }
+  ]
+}

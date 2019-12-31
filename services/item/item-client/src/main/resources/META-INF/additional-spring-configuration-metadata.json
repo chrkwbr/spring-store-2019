@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "item.url",
+      "type": "java.lang.String",
+      "description": "URL of Item service.",
+      "defaultValue": "http://localhost:9001"
+    }
+  ]
+}
