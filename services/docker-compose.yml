@@ -8,6 +8,10 @@ services:
     mem_limit: 256m
     environment:
     - SPRING_PROFILES_ACTIVE=docker
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - UI_URL=http://ui
+    - WEB_URL=http://store-web:9000
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./gateway-server/target:/app
@@ -43,6 +47,12 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - ITEM_URL=http://item-service:9001
+    - STOCK_URL=http://stock-service:9002
+    - CART_URL=http://cart-service:9003
+    - ORDER_URL=http://order-service:9004
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./store-web/target:/app
@@ -64,6 +74,9 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/item
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./item/item-service/target:/app
@@ -85,6 +98,9 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/stock
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./stock/stock-service/target:/app
@@ -106,6 +122,10 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/cart
+    - ITEM_URL=http://item-service:9001
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./cart/cart-service/target:/app
@@ -127,6 +147,13 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_RABBITMQ_HOST=rabbit-mq
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/order
+    - STOCK_URL=http://stock-service:9002
+    - CART_URL=http://cart-service:9003
+    - PAYMENT_URL=http://payment-service:9005
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./order/order-service/target:/app
@@ -148,6 +175,10 @@ services:
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     - SERVER_TOMCAT_MAX_THREADS=4
+    - SPRING_RABBITMQ_HOST=rabbit-mq
+    - SPRING_ZIPKIN_BASE_URL=http://zipkin-server:9411/
+    - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-proxy
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/payment
     - "_JAVA_OPTIONS=-Xmx80m -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo"
     volumes:
     - ./payment/payment-service/target:/app
