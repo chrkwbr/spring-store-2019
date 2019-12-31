@@ -54,7 +54,7 @@ cf create-service p.mysql db-small item-db
 cf create-service p.mysql db-small order-db
 cf create-service p.mysql db-small payment-db
 cf create-service p.mysql db-small stock-db
-cf create-service p.rabbitmq single-node-3.7 payment-mq
+cf create-service p.rabbitmq single-node-3.7 order-mq
 ```
 
 or for Pivotal Web Services
@@ -65,7 +65,7 @@ cf create-service cleardb spark item-db
 cf create-service cleardb spark order-db
 cf create-service cleardb spark payment-db
 cf create-service cleardb spark stock-db
-cf create-service cloudamqp lemur payment-mq
+cf create-service cloudamqp lemur order-mq
 ```
 
 Deploy Zipkin
