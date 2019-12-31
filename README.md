@@ -150,3 +150,79 @@ Finally deploy the gateway
 ```
 cf push -f gateway-server/manifest.yml 
 ```
+
+### In case of using C2C networking
+
+> Delete all apps, routes and user-provided-services deployed above except for Zipkin
+
+```
+cf push -f item/item-service/manifest.yml -d apps.internal
+ITEM_HOST=$(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.host')
+ITEM_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service item -p "{\"url\":\"http://${ITEM_HOST}.${ITEM_DOMAIN}:8080\"}"
+```
+
+```
+cf push -f stock/stock-service/manifest.yml -d apps.internal
+STOCK_HOST=$(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.host')
+STOCK_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service stock -p "{\"url\":\"http://${STOCK_HOST}.${STOCK_DOMAIN}:8080\"}"
+```
+
+```
+cf push -f payment/payment-service/manifest.yml -d apps.internal
+PAYMENT_HOST=$(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.host')
+PAYMENT_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service payment -p "{\"url\":\"http://${PAYMENT_HOST}.${PAYMENT_DOMAIN}:8080\"}"
+```
+
+```
+cf push -f cart/cart-service/manifest.yml -d apps.internal
+CART_HOST=$(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.host')
+CART_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service cart -p "{\"url\":\"http://${CART_HOST}.${CART_DOMAIN}:8080\"}"
+cf add-network-policy cart --destination-app item --protocol tcp --port 8080
+```
+
+```
+cf push -f order/order-service/manifest.yml -d apps.internal
+ORDER_HOST=$(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.host')
+ORDER_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service order -p "{\"url\":\"http://${ORDER_HOST}.${ORDER_DOMAIN}:8080\"}"
+cf add-network-policy order --destination-app stock --protocol tcp --port 8080
+cf add-network-policy order --destination-app cart --protocol tcp --port 8080
+cf add-network-policy order --destination-app payment --protocol tcp --port 8080
+```
+
+```
+cf push -f store-web/manifest.yml -d apps.internal
+STORE_WEB_HOST=$(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.host')
+STORE_WEB_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service store-web -p "{\"url\":\"http://${STORE_WEB_HOST}.${STORE_WEB_DOMAIN}:8080\"}"
+cf add-network-policy store-web --destination-app item --protocol tcp --port 8080
+cf add-network-policy store-web --destination-app stock --protocol tcp --port 8080
+cf add-network-policy store-web --destination-app cart --protocol tcp --port 8080
+cf add-network-policy store-web --destination-app order --protocol tcp --port 8080
+```
+
+and deploy UI
+
+```
+cd ui
+npm run build
+
+cf push -d apps.internal
+STORE_UI_HOST=$(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.host')
+STORE_UI_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+cf create-user-provided-service store-ui -p "{\"url\":\"http://${STORE_UI_HOST}.${STORE_UI_DOMAIN}:8080\"}"
+
+cd ..
+```
+
+Finally deploy the gateway
+
+```
+cf push -f gateway-server/manifest.yml 
+cf add-network-policy store --destination-app store-web --protocol tcp --port 8080
+cf add-network-policy store --destination-app store-ui --protocol tcp --port 8080
+```
