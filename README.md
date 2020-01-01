@@ -226,3 +226,93 @@ cf push -f gateway-server/manifest.yml
 cf add-network-policy store --destination-app store-web --protocol tcp --port 8080
 cf add-network-policy store --destination-app store-ui --protocol tcp --port 8080
 ```
+
+### Prometheus RSocket Proxy
+
+If you want to deploy Prometheus RSocket Proxy, it requires TCP Routing
+
+```
+SPACE_NAME=$(cat ~/.cf/config.json | jq -r .SpaceFields.Name)
+APPS_DOMAIN=$(cf domains | grep apps | head -1 | awk '{print $1}')
+TCP_DOMAIN=$(cf domains | grep tcp | head -1 | awk '{print $1}')
+PRORXY_HOST=prometheus-proxy # should be unique
+TCP_PORT=10014 # should be unique
+
+cf create-route ${SPACE_NAME} ${APPS_DOMAIN} --hostname ${PRORXY_HOST}
+cf create-route ${SPACE_NAME} ${TCP_DOMAIN} --port ${TCP_PORT}
+
+cf push prometheus-proxy --docker-image micrometermetrics/prometheus-rsocket-proxy:0.9.0 --no-route
+
+APP_GUID=$(cf app prometheus-proxy --guid)
+HTTP_ROUTE_GUID=$(cf curl /v2/routes?q=host:${PRORXY_HOST} | jq -r .resources[0].metadata.guid)
+TCP_ROUTE_GUID=$(cf curl /v2/routes?q=port:${TCP_PORT} | jq -r .resources[0].metadata.guid)
+
+cf curl /v2/apps/${APP_GUID} -X PUT -d "{\"ports\": [8080, 7001]}"
+
+cf curl /v2/route_mappings -X POST -d "{\"app_guid\": \"${APP_GUID}\", \"route_guid\": \"${HTTP_ROUTE_GUID}\", \"app_port\": 8080}"
+cf curl /v2/route_mappings -X POST -d "{\"app_guid\": \"${APP_GUID}\", \"route_guid\": \"${TCP_ROUTE_GUID}\", \"app_port\": 7001}"
+```
+
+Configure apps
+
+```
+for APP in cart item order payment stock store store-web;do
+  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST ${TCP_DOMAIN}
+  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT ${TCP_PORT}
+  cf restart ${APP}
+done
+```
+
+### Deploy Prometheus
+
+> WARNING: The prometheus instance deployed via this instruction is ephemeral. All data will be lost when restarted.
+
+```
+cd infra/prometheus
+
+PROMETHEUS_VERSION=2.15.1
+if [ ! -d prometheus-${PROMETHEUS_VERSION}.linux-amd64 ];then
+    wget https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
+    tar xzf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
+    rm -f prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
+fi
+
+PROXY_HOST=$(cf curl /v2/apps/$(cf app prometheus-proxy --guid)/routes | jq -r '.resources[0].entity.host')
+PROXY_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app prometheus-proxy --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+ZIPKIN_HOST=$(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.host')
+ZIPKIN_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+
+cat prometheus.yml | sed -e "s/prometheus-proxy:8080/${PROXY_HOST}.${PROXY_DOMAIN}:80/g" -e "s/zipkin-server:9411/${ZIPKIN_HOST}.${ZIPKIN_DOMAIN}:80/g" > ./prometheus-${PROMETHEUS_VERSION}.linux-amd64/prometheus.yml
+
+cf push prometheus -k 2G -b binary_buildpack -p ./prometheus-${PROMETHEUS_VERSION}.linux-amd64 --random-route -c "./prometheus --web.listen-address=:8080 --config.file=./prometheus.yml"
+
+cd ../..
+```
+
+### Deploy Grafana
+
+> WARNING: The grafana instance deployed via this instruction is ephemeral. All data will be lost when restarted.
+
+```
+cd infra/grafana
+
+GRAFANA_VERSION=6.5.2
+if [ ! -d grafana-${GRAFANA_VERSION} ];then
+    wget https://dl.grafana.com/oss/release/grafana-${GRAFANA_VERSION}.linux-amd64.tar.gz
+    tar xzf grafana-${GRAFANA_VERSION}.linux-amd64.tar.gz 
+    rm -f grafana-${GRAFANA_VERSION}.linux-amd64.tar.gz 
+fi
+
+sed -i '' -e 's|^http_port = 3000$|http_port = 8080|' grafana-${GRAFANA_VERSION}/conf/defaults.ini
+
+PROMETHEUS_HOST=$(cf curl /v2/apps/$(cf app prometheus --guid)/routes | jq -r '.resources[0].entity.host')
+PROMETHEUS_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app prometheus --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
+
+cat provisioning/datasources/datasources.yaml | sed -e "s|http://prometheus:9090|https://${PROMETHEUS_HOST}.${PROMETHEUS_DOMAIN}|g" > grafana-${GRAFANA_VERSION}/conf/provisioning/datasources/datasources.yaml
+cp -r provisioning/dashboards/* grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/
+sed -i '' -e 's|/etc/grafana/|/home/vcap/app/conf/|g' grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/dashboards.yaml
+
+cf push grafana -b binary_buildpack -p ./grafana-${GRAFANA_VERSION} --random-route -c "./bin/grafana-server -config=./conf/defaults.ini"
+
+cd ../..
+```
