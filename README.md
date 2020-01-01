@@ -74,10 +74,7 @@ Deploy Zipkin
 cf push zipkin --docker-image openzipkin/zipkin-slim -m 512m --random-route --no-start
 cf set-env zipkin MEM_MAX_SPANS 100000
 cf start zipkin
-
-ZIPKIN_HOST=$(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.host')
-ZIPKIN_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service zipkin -p "{\"url\":\"https://${ZIPKIN_HOST}.${ZIPKIN_DOMAIN}\"}"
+cf create-user-provided-service zipkin -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app zipkin --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 Build apps
@@ -91,44 +88,32 @@ For the first time, deploy services int the following order
 
 ```
 cf push -f item/item-service/manifest.yml 
-ITEM_HOST=$(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.host')
-ITEM_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service item -p "{\"url\":\"https://${ITEM_HOST}.${ITEM_DOMAIN}\"}"
+cf create-user-provided-service item -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app item --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 ```
 cf push -f stock/stock-service/manifest.yml 
-STOCK_HOST=$(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.host')
-STOCK_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service stock -p "{\"url\":\"https://${STOCK_HOST}.${STOCK_DOMAIN}\"}"
+cf create-user-provided-service stock -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app stock --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 ```
 cf push -f payment/payment-service/manifest.yml 
-PAYMENT_HOST=$(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.host')
-PAYMENT_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service payment -p "{\"url\":\"https://${PAYMENT_HOST}.${PAYMENT_DOMAIN}\"}"
+cf create-user-provided-service payment -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app payment --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 ```
 cf push -f cart/cart-service/manifest.yml 
-CART_HOST=$(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.host')
-CART_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service cart -p "{\"url\":\"https://${CART_HOST}.${CART_DOMAIN}\"}"
+cf create-user-provided-service cart -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app cart --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 ```
 cf push -f order/order-service/manifest.yml 
-ORDER_HOST=$(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.host')
-ORDER_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service order -p "{\"url\":\"https://${ORDER_HOST}.${ORDER_DOMAIN}\"}"
+cf create-user-provided-service order -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app order --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 ```
 cf push -f store-web/manifest.yml 
-STORE_WEB_HOST=$(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.host')
-STORE_WEB_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service store-web -p "{\"url\":\"https://${STORE_WEB_HOST}.${STORE_WEB_DOMAIN}\"}"
+cf create-user-provided-service store-web -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app store-web --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 ```
 
 and deploy UI
@@ -138,9 +123,7 @@ cd ui
 npm run build
 
 cf push
-STORE_UI_HOST=$(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.host')
-STORE_UI_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service store-ui -p "{\"url\":\"https://${STORE_UI_HOST}.${STORE_UI_DOMAIN}\"}"
+cf create-user-provided-service store-ui -p "{\"url\":\"https://$(cf curl /v2/apps/$(cf app store-ui --guid)/stats | jq -r '.["0"].stats.uris[0]')\"}"
 
 cd ..
 ```
@@ -157,38 +140,28 @@ cf push -f gateway-server/manifest.yml
 
 ```
 cf push -f item/item-service/manifest.yml -d apps.internal
-ITEM_HOST=$(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.host')
-ITEM_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app item --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service item -p "{\"url\":\"http://${ITEM_HOST}.${ITEM_DOMAIN}:8080\"}"
+cf create-user-provided-service item -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app item --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 ```
 
 ```
 cf push -f stock/stock-service/manifest.yml -d apps.internal
-STOCK_HOST=$(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.host')
-STOCK_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app stock --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service stock -p "{\"url\":\"http://${STOCK_HOST}.${STOCK_DOMAIN}:8080\"}"
+cf create-user-provided-service stock -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app stock --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 ```
 
 ```
 cf push -f payment/payment-service/manifest.yml -d apps.internal
-PAYMENT_HOST=$(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.host')
-PAYMENT_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app payment --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service payment -p "{\"url\":\"http://${PAYMENT_HOST}.${PAYMENT_DOMAIN}:8080\"}"
+cf create-user-provided-service payment -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app payment --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 ```
 
 ```
 cf push -f cart/cart-service/manifest.yml -d apps.internal
-CART_HOST=$(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.host')
-CART_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app cart --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service cart -p "{\"url\":\"http://${CART_HOST}.${CART_DOMAIN}:8080\"}"
+cf create-user-provided-service cart -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app cart --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 cf add-network-policy cart --destination-app item --protocol tcp --port 8080
 ```
 
 ```
 cf push -f order/order-service/manifest.yml -d apps.internal
-ORDER_HOST=$(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.host')
-ORDER_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app order --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service order -p "{\"url\":\"http://${ORDER_HOST}.${ORDER_DOMAIN}:8080\"}"
+cf create-user-provided-service order -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app order --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 cf add-network-policy order --destination-app stock --protocol tcp --port 8080
 cf add-network-policy order --destination-app cart --protocol tcp --port 8080
 cf add-network-policy order --destination-app payment --protocol tcp --port 8080
@@ -196,9 +169,7 @@ cf add-network-policy order --destination-app payment --protocol tcp --port 8080
 
 ```
 cf push -f store-web/manifest.yml -d apps.internal
-STORE_WEB_HOST=$(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.host')
-STORE_WEB_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-web --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service store-web -p "{\"url\":\"http://${STORE_WEB_HOST}.${STORE_WEB_DOMAIN}:8080\"}"
+cf create-user-provided-service store-web -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app store-web --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 cf add-network-policy store-web --destination-app item --protocol tcp --port 8080
 cf add-network-policy store-web --destination-app stock --protocol tcp --port 8080
 cf add-network-policy store-web --destination-app cart --protocol tcp --port 8080
@@ -212,9 +183,7 @@ cd ui
 npm run build
 
 cf push -d apps.internal
-STORE_UI_HOST=$(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.host')
-STORE_UI_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app store-ui --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-cf create-user-provided-service store-ui -p "{\"url\":\"http://${STORE_UI_HOST}.${STORE_UI_DOMAIN}:8080\"}"
+cf create-user-provided-service store-ui -p "{\"url\":\"http://$(cf curl /v2/apps/$(cf app store-ui --guid)/stats | jq -r '.["0"].stats.uris[0]'):8080\"}"
 
 cd ..
 ```
@@ -277,12 +246,9 @@ if [ ! -d prometheus-${PROMETHEUS_VERSION}.linux-amd64 ];then
     rm -f prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
 fi
 
-PROXY_HOST=$(cf curl /v2/apps/$(cf app prometheus-proxy --guid)/routes | jq -r '.resources[0].entity.host')
-PROXY_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app prometheus-proxy --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-ZIPKIN_HOST=$(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.host')
-ZIPKIN_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app zipkin --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-
-cat prometheus.yml | sed -e "s/prometheus-proxy:8080/${PROXY_HOST}.${PROXY_DOMAIN}:80/g" -e "s/zipkin-server:9411/${ZIPKIN_HOST}.${ZIPKIN_DOMAIN}:80/g" > ./prometheus-${PROMETHEUS_VERSION}.linux-amd64/prometheus.yml
+PROXY_HOST=$(cf curl /v2/apps/$(cf app prometheus-proxy --guid)/stats | jq -r '.["0"].stats.uris[0]')
+ZIPKIN_HOST=$(cf curl /v2/apps/$(cf app zipkin --guid)/stats | jq -r '.["0"].stats.uris[0]')
+cat prometheus.yml | sed -e "s/prometheus-proxy:8080/${PROXY_HOST}:80/g" -e "s/zipkin-server:9411/${ZIPKIN_HOST}:80/g" > ./prometheus-${PROMETHEUS_VERSION}.linux-amd64/prometheus.yml
 
 cf push prometheus -k 2G -b binary_buildpack -p ./prometheus-${PROMETHEUS_VERSION}.linux-amd64 --random-route -c "./prometheus --web.listen-address=:8080 --config.file=./prometheus.yml"
 
@@ -305,10 +271,8 @@ fi
 
 sed -i '' -e 's|^http_port = 3000$|http_port = 8080|' grafana-${GRAFANA_VERSION}/conf/defaults.ini
 
-PROMETHEUS_HOST=$(cf curl /v2/apps/$(cf app prometheus --guid)/routes | jq -r '.resources[0].entity.host')
-PROMETHEUS_DOMAIN=$(cf curl $(cf curl /v2/apps/$(cf app prometheus --guid)/routes | jq -r '.resources[0].entity.domain_url') | jq -r '.entity.name')
-
-cat provisioning/datasources/datasources.yaml | sed -e "s|http://prometheus:9090|https://${PROMETHEUS_HOST}.${PROMETHEUS_DOMAIN}|g" > grafana-${GRAFANA_VERSION}/conf/provisioning/datasources/datasources.yaml
+PROMETHEUS_HOST=$(cf curl /v2/apps/$(cf app prometheus --guid)/stats | jq -r '.["0"].stats.uris[0]')
+cat provisioning/datasources/datasources.yaml | sed -e "s|http://prometheus:9090|https://${PROMETHEUS_HOST}|g" > grafana-${GRAFANA_VERSION}/conf/provisioning/datasources/datasources.yaml
 cp -r provisioning/dashboards/* grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/
 sed -i '' -e 's|/etc/grafana/|/home/vcap/app/conf/|g' grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/dashboards.yaml
 
