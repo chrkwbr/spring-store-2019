@@ -210,7 +210,12 @@ TCP_PORT=10014 # should be unique
 cf create-route ${SPACE_NAME} ${APPS_DOMAIN} --hostname ${PRORXY_HOST}
 cf create-route ${SPACE_NAME} ${TCP_DOMAIN} --port ${TCP_PORT}
 
-cf push prometheus-proxy --docker-image micrometermetrics/prometheus-rsocket-proxy:0.9.0 --no-route
+cf push prometheus-proxy --docker-image micrometermetrics/prometheus-rsocket-proxy:0.9.0 --no-route --no-start
+cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_ORGANIZATION '${vcap.application.organization_name}'
+cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_SPACE '${vcap.application.space_name}'
+cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_APPLICATION '${vcap.application.application_name}'
+cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_INSTANCE_ID '${management.metrics.tags.application}:${vcap.application.instance_index}'
+cf start prometheus-proxy
 
 APP_GUID=$(cf app prometheus-proxy --guid)
 HTTP_ROUTE_GUID=$(cf curl /v2/routes?q=host:${PRORXY_HOST} | jq -r .resources[0].metadata.guid)
