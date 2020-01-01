@@ -7,6 +7,7 @@ applications:
     JAVA_OPTS: -XX:ReservedCodeCacheSize=32M -Xss512k -Duser.timezone=Asia/Tokyo
     JBP_CONFIG_OPEN_JDK_JRE: '{memory_calculator: {stack_threads: 20}, jre: {version: 11.+}}'
     SPRING_ZIPKIN_BASE_URL: ${vcap.services.zipkin.credentials.url}
+    SPRING_ZIPKIN_SERVICE_NAME: ${vcap.application.organization_name}:${vcap.application.space_name}:${spring.application.name}
     MANAGEMENT_METRICS_TAGS_ORGANIZATION: ${vcap.application.organization_name}
     MANAGEMENT_METRICS_TAGS_SPACE: ${vcap.application.space_name}
     MANAGEMENT_METRICS_TAGS_APPLICATION: ${vcap.application.application_name}
