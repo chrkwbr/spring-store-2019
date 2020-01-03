@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 @SpringBootApplication
 public class GatewayServer {
@@ -26,20 +28,20 @@ public class GatewayServer {
     private String webUrl;
 
     @Bean
-    public RouteLocator customRouteLocator(RouteLocatorBuilder builder, AccessLoggingGatewayFilterFactory accessLoggingFilterFactory) {
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder, AccessLoggingGatewayFilterFactory accessLoggingFilterFactory, Environment env) {
         log.info("UI: {}, Web: {}", this.uiUrl, this.webUrl);
         return builder.routes()
             .route(r -> r.path("/api/**")
-                .filters(f -> f
+                .filters(f -> (env.acceptsProfiles(Profiles.of("cloud")) ? f : f
                     .filter(accessLoggingFilterFactory.apply(c -> {
-                    }))
+                    })))
                     .rewritePath("/api/(?<path>.*)", "/${path}"))
                 .uri(this.webUrl)
             )
             .route(r -> (r.path("/**"))
-                .filters(f -> f
+                .filters(f -> (env.acceptsProfiles(Profiles.of("cloud")) ? f : f
                     .filter(accessLoggingFilterFactory.apply(c -> {
-                    }))
+                    })))
                     .rewritePath("/(?<path>.*)", "/${path}"))
                 .uri(this.uiUrl)
             )
