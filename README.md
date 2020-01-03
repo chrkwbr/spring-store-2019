@@ -230,9 +230,12 @@ cf curl /v2/route_mappings -X POST -d "{\"app_guid\": \"${APP_GUID}\", \"route_g
 Configure apps
 
 ```
+cf create-user-provided-service prometheus-proxy -p "{\"host\": \"${TCP_DOMAIN}\", \"port\": ${TCP_PORT}}"
+
 for APP in cart item order payment stock store store-web;do
-  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST ${TCP_DOMAIN}
-  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT ${TCP_PORT}
+  cf bind-service ${APP} prometheus-proxy
+  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST '${vcap.services.prometheus-proxy.credentials.host}'
+  cf set-env ${APP} MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT '${vcap.services.prometheus-proxy.credentials.port}'
   cf restart ${APP}
 done
 ```
