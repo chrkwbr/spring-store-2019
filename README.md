@@ -210,7 +210,7 @@ TCP_PORT=10014 # should be unique
 cf create-route ${SPACE_NAME} ${APPS_DOMAIN} --hostname ${PRORXY_HOST}
 cf create-route ${SPACE_NAME} ${TCP_DOMAIN} --port ${TCP_PORT}
 
-cf push prometheus-proxy --docker-image micrometermetrics/prometheus-rsocket-proxy:0.9.0 --no-route --no-start
+cf push prometheus-proxy -m 512m --docker-image micrometermetrics/prometheus-rsocket-proxy:0.9.0 --no-route --no-start
 cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_ORGANIZATION '${vcap.application.organization_name}'
 cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_SPACE '${vcap.application.space_name}'
 cf set-env prometheus-proxy MANAGEMENT_METRICS_TAGS_APPLICATION '${vcap.application.application_name}'
@@ -281,7 +281,7 @@ cat provisioning/datasources/datasources.yaml | sed -e "s|http://prometheus:9090
 cp -r provisioning/dashboards/* grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/
 sed -i '' -e 's|/etc/grafana/|/home/vcap/app/conf/|g' grafana-${GRAFANA_VERSION}/conf/provisioning/dashboards/dashboards.yaml
 
-cf push grafana -b binary_buildpack -p ./grafana-${GRAFANA_VERSION} --random-route -c "./bin/grafana-server -config=./conf/defaults.ini"
+cf push grafana -m 128m -b binary_buildpack -p ./grafana-${GRAFANA_VERSION} --random-route -c "./bin/grafana-server -config=./conf/defaults.ini"
 
 cd ../..
 ```
